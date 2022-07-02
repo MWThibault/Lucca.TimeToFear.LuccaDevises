@@ -31,8 +31,7 @@ namespace LuccaDevises.Core
                 return Calculate(value, minTravelResult);
             }
 
-            // pas de route trouvée
-            return null;
+            throw new Exception("Pas de route de conversion trouvée");
         }
 
         private int Calculate(double value, LinkedList<DevisesLinkedListItem> result)
