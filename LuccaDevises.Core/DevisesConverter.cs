@@ -1,11 +1,10 @@
-﻿using LuccaDevises.Entities;
-using LuccaDevises.Helpers;
+﻿using LuccaDevises.Core.Entities;
+using LuccaDevises.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
-namespace LuccaDevises
+namespace LuccaDevises.Core
 {
     public class DevisesConverter
     {

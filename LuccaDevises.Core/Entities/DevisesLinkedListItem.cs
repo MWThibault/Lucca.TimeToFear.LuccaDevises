@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace LuccaDevises.Entities
+﻿namespace LuccaDevises.Core.Entities
 {
     public class DevisesLinkedListItem
     {

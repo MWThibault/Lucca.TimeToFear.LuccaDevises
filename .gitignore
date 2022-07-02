@@ -1,3 +1,8 @@
 /LuccaDevises/obj
 /LuccaDevises/bin
 /.vs
+/LuccaDevises.Core.Tests/bin
+/LuccaDevises.Core.Tests/obj
+/LuccaDevises.Core/bin
+/LuccaDevises.Core/obj
+/TestResults

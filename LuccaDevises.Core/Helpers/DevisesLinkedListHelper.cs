@@ -1,9 +1,6 @@
-﻿using LuccaDevises.Entities;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using LuccaDevises.Core.Entities;
 
-namespace LuccaDevises.Helpers
+namespace LuccaDevises.Core.Helpers
 {
     public static class DevisesLinkedListHelper
     {

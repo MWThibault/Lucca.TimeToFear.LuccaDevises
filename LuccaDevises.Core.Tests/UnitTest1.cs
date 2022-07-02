@@ -1,13 +1,14 @@
-﻿using LuccaDevises.Core;
 using LuccaDevises.Core.Entities;
-using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Collections.Generic;
 
-namespace LuccaDevises
+namespace LuccaDevises.Core.Tests
 {
-    class Program
+    [TestClass]
+    public class UnitTest1
     {
-        static void Main(string[] args)
+        [TestMethod]
+        public void TestMethod1()
         {
             List<DevisesConvertItem> devises = new List<DevisesConvertItem>();
             devises.Add(new DevisesConvertItem { DeviseFrom = "AUD", DeviseTo = "CHF", ValueConvertion = 0.9661 });
@@ -19,9 +20,7 @@ namespace LuccaDevises
 
 
             DevisesConverter devisesConverter = new DevisesConverter(devises);
-            Console.WriteLine(devisesConverter.Convert("EUR", "JPY", 550)?.ToString());
-
-            Console.ReadLine();
+            Assert.AreEqual(devisesConverter.Convert("EUR", "JPY", 550), 59033);
         }
     }
 }
