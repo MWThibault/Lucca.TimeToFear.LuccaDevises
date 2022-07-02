@@ -1,5 +1,4 @@
 ﻿using LuccaDevises.Core.Entities;
-using LuccaDevises.Core.Helpers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +9,12 @@ namespace LuccaDevises.Core
     {
         public List<DevisesConvertItem> Devises { get; }
 
-        private List<DevisesLinkedListItem> SearchResults { get; }
+        private List<LinkedList<DevisesLinkedListItem>> SearchResults { get; }
 
         public DevisesConverter(List<DevisesConvertItem> devises)
         {
             this.Devises = devises;
-            this.SearchResults = new List<DevisesLinkedListItem>();
+            this.SearchResults = new List<LinkedList<DevisesLinkedListItem>>();
         }
 
         public int? Convert(string deviseFrom, string deviseTo, double value)
@@ -26,35 +25,35 @@ namespace LuccaDevises.Core
             Search(deviseFrom, deviseTo, 0, null);
 
             // Sélection de la route la plus rapide pour faire le calcul
-            var minTravelResult = SearchResults.OrderBy(x => x.CountLinkedList()).FirstOrDefault();
+            var minTravelResult = SearchResults.OrderBy(x => x.Count).FirstOrDefault();
             if (minTravelResult != null)
             {
-                return Calculate(value, minTravelResult.GetStartingItem());
+                return Calculate(value, minTravelResult);
             }
 
             // pas de route trouvée
             return null;
         }
 
-        private int Calculate(double value, DevisesLinkedListItem result)
+        private int Calculate(double value, LinkedList<DevisesLinkedListItem> result)
         {
-            if (result.Operators == DevisesOperators.FromToTo)
+            foreach (var item in result)
             {
-                value = Math.Round(value * result.Item.ValueConvertion, 4);
+                if (item.Operators == DevisesOperators.FromToTo)
+                {
+                    value = Math.Round(value * item.Item.ValueConvertion, 4);
+                }
+                else if (item.Operators == DevisesOperators.ToToFrom)
+                {
+                    value = Math.Round(value * Math.Round(1 / item.Item.ValueConvertion, 4), 4);
+                }
             }
-            else if (result.Operators == DevisesOperators.ToToFrom)
-            {
-                value = Math.Round(value * Math.Round(1 / result.Item.ValueConvertion, 4), 4);
-            }
-
-            if (result.Next != null)
-                return Calculate(value, result.Next);
 
             // résultat arrondi à l'entier
             return (int)Math.Round(value, 0);
         }
 
-        private void Search(string deviseSearch, string deviseStop, int countRecursive, DevisesLinkedListItem resultLinkedList)
+        private void Search(string deviseSearch, string deviseStop, int countRecursive, LinkedList<DevisesLinkedListItem> resultLinkedList)
         {
             // On ne peut pas affecter plus de route que d'élément dans le tableau, donc on sort de la récursivité une fois tout le tableau parcouru
             if (countRecursive == Devises.Count)
@@ -63,7 +62,7 @@ namespace LuccaDevises.Core
             foreach (var item in Devises)
             {
                 // On évite de faire chemin inverse sur la même ligne du tableau des devises
-                if (item == resultLinkedList?.Previous?.Item)
+                if (item == resultLinkedList?.Last?.Value?.Item)
                     continue;
 
                 // Vérification chemin de From => To
@@ -74,22 +73,24 @@ namespace LuccaDevises.Core
             return;
         }
 
-        private void SearchComparative(string deviseSearch, string deviseStop, int countRecursive, DevisesLinkedListItem resultLinkedList, DevisesConvertItem item, string compare1, string compare2, DevisesOperators operators)
+        private void SearchComparative(string deviseSearch, string deviseStop, int countRecursive, LinkedList<DevisesLinkedListItem> resultLinkedList, DevisesConvertItem item, string compare1, string compare2, DevisesOperators operators)
         {
             if (compare1 == deviseSearch)
             {
                 if (resultLinkedList == null)
-                    resultLinkedList = new DevisesLinkedListItem(null);
-                resultLinkedList.Item = item;
-                resultLinkedList.Operators = operators;
+                    resultLinkedList = new LinkedList<DevisesLinkedListItem>();
+                DevisesLinkedListItem linkedItem = new DevisesLinkedListItem();
+                linkedItem.Item = item;
+                linkedItem.Operators = operators;
+                resultLinkedList.AddLast(linkedItem);
+
                 if (compare2 == deviseStop)
                 {
-                    SearchResults.Add(resultLinkedList.GetClone());
+                    SearchResults.Add(resultLinkedList);
                 }
                 else
                 {
-                    resultLinkedList.Next = new DevisesLinkedListItem(resultLinkedList);
-                    Search(compare2, deviseStop, ++countRecursive, resultLinkedList.Next);
+                    Search(compare2, deviseStop, ++countRecursive, new LinkedList<DevisesLinkedListItem>(resultLinkedList));
                 }
             }
         }
